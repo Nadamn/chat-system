@@ -1,0 +1,39 @@
+version: '3'
+services:
+  web:
+    build: app/
+    ports:
+      - "3000:3000"
+    depends_on: 
+      - mysql
+      - elasticSearch
+      - rabbitMQ
+    links:
+      - mysql
+      - elasticSearch
+      - rabbitMQ
+    container_name: instabug_web
+
+  mysql:
+    image: "mysql:5.7"
+    environment:
+      - MYSQL_ROOT_PASSWORD=instabug
+    ports:
+      - "3306:3306"
+    container_name: instabug_mysql
+
+  elasticSearch:
+    image: "elasticsearch:7.1.1"
+    environment: 
+      - discovery.type=single-node
+    ports:
+      - "9300:9300"
+      - "9200:9200"
+    container_name: instabug_elasticsearch
+
+  rabbitMQ:
+    image: "rabbitmq:3"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    container_name: instabug_rabbitmq

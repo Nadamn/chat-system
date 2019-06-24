@@ -1,0 +1,41 @@
+version: '3'
+services:
+  web:
+    build: app/
+    ports:
+      - "3000:3000"
+    depends_on: 
+      - db
+      - elasticSearch
+      - rabbitMQ
+    links:
+      - db
+      - elasticSearch
+      - rabbitMQ
+    volumes:
+      - ./app:/usr/src/app
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    container_name: instabug_web
+
+  db:
+    build: .
+    ports:
+      - "3306:3306"
+    container_name: instabug_mysql
+
+
+  elasticSearch:
+    image: "elasticsearch:7.1.1"
+    environment: 
+      - discovery.type=single-node
+    ports:
+      - "9300:9300"
+      - "9200:9200"
+    container_name: instabug_elasticsearch
+
+  rabbitMQ:
+    image: "rabbitmq:3"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    container_name: instabug_rabbitmq
